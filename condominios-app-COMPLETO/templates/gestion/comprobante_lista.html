@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Comprobantes{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Comprobantes de pago</h1>
+    <a href="{% url 'comprobante_crear' %}" class="btn btn-primary">
+        <i class="bi bi-upload"></i> Subir comprobante
+    </a>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Unidad</th>
+                    <th>Factura</th>
+                    <th>Monto declarado</th>
+                    <th>Fecha declarada</th>
+                    <th>Estado</th>
+                    <th>Subido</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in comprobantes %}
+            <tr>
+                <td>{{ c.factura.unidad.identificador }}</td>
+                <td>{{ c.factura.periodo }}</td>
+                <td>${{ c.monto_declarado }}</td>
+                <td>{{ c.fecha_declarada }}</td>
+                <td>
+                    {% if c.estado == 'aprobado' %}
+                    <span class="badge text-bg-success">Aprobado</span>
+                    {% elif c.estado == 'rechazado' %}
+                    <span class="badge text-bg-danger">Rechazado</span>
+                    {% else %}
+                    <span class="badge text-bg-warning">Pendiente</span>
+                    {% endif %}
+                </td>
+                <td>{{ c.fecha_subida|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'comprobante_detalle' c.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-muted text-center py-4">No hay comprobantes registrados.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

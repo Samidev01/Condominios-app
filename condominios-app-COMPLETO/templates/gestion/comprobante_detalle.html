@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Comprobante #{{ comprobante.pk }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h1 class="mb-4">Revisar comprobante</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Unidad</dt>
+                    <dd class="col-sm-8">{{ comprobante.factura.unidad.identificador }}</dd>
+                    <dt class="col-sm-4">Factura</dt>
+                    <dd class="col-sm-8">{{ comprobante.factura.periodo }} — ${{ comprobante.factura.monto }}</dd>
+                    <dt class="col-sm-4">Monto declarado</dt>
+                    <dd class="col-sm-8">${{ comprobante.monto_declarado }}</dd>
+                    <dt class="col-sm-4">Fecha declarada</dt>
+                    <dd class="col-sm-8">{{ comprobante.fecha_declarada }}</dd>
+                    <dt class="col-sm-4">Estado</dt>
+                    <dd class="col-sm-8">{{ comprobante.get_estado_display }}</dd>
+                    {% if comprobante.notas %}
+                    <dt class="col-sm-4">Notas</dt>
+                    <dd class="col-sm-8">{{ comprobante.notas }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        {% if comprobante.estado == 'pendiente' %}
+        <div class="d-flex gap-2">
+            <form method="post" action="{% url 'comprobante_aprobar' comprobante.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-lg"></i> Aprobar y marcar factura pagada
+                </button>
+            </form>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rechazarModal">
+                <i class="bi bi-x-lg"></i> Rechazar
+            </button>
+        </div>
+
+        <div class="modal fade" id="rechazarModal" tabindex="-1">
+            <div class="modal-dialog">
+                <form method="post" action="{% url 'comprobante_rechazar' comprobante.pk %}" class="modal-content">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rechazar comprobante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Motivo (opcional)</label>
+                        <textarea name="notas" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Rechazar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Imagen del comprobante</div>
+            <div class="card-body text-center">
+                <img src="{{ comprobante.imagen.url }}" alt="Comprobante" class="img-fluid rounded" style="max-height: 500px;">
+            </div>
+        </div>
+    </div>
+</div>
+<a href="{% url 'comprobante_lista' %}" class="btn btn-outline-secondary mt-3">Volver</a>
+{% endblock %}

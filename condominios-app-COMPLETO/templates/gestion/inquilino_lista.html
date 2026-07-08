@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Inquilinos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Inquilinos</h1>
+    <a href="{% url 'inquilino_crear' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nuevo inquilino
+    </a>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Unidad</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Inicio contrato</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in inquilinos %}
+            <tr>
+                <td>{{ i.nombre }}</td>
+                <td>{{ i.unidad.identificador }}</td>
+                <td>{{ i.telefono|default:"—" }}</td>
+                <td>{{ i.email|default:"—" }}</td>
+                <td>{{ i.fecha_inicio_contrato }}</td>
+                <td>
+                    <a href="{% url 'inquilino_editar' i.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-muted text-center py-4">No hay inquilinos registrados.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

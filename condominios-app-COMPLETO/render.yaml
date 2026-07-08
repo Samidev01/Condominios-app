@@ -1,0 +1,28 @@
+databases:
+  - name: condominios-db
+    databaseName: condominios
+    user: condominios
+    plan: free
+
+services:
+  - type: web
+    name: condominios-app
+    runtime: python
+    plan: free
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.9
+      - key: DATABASE_URL
+        fromDatabase:
+          name: condominios-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: CLOUDINARY_URL
+        sync: false

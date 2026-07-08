@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Facturas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Facturas — {{ mes }}/{{ anio }}</h1>
+    <a href="{% url 'factura_generar' %}" class="btn btn-primary">
+        <i class="bi bi-calendar-plus"></i> Generar facturas
+    </a>
+</div>
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-auto">
+        <label class="form-label">Mes</label>
+        {{ form.mes }}
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Año</label>
+        {{ form.anio }}
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Filtrar</button>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'exportar_excel' %}?mes={{ mes }}&anio={{ anio }}" class="btn btn-success btn-sm">Excel</a>
+        <a href="{% url 'exportar_pdf' %}?mes={{ mes }}&anio={{ anio }}" class="btn btn-danger btn-sm">PDF</a>
+    </div>
+</form>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card"><div class="card-body"><small class="text-muted">Total</small><h4>${{ resumen.total_monto }}</h4></div></div></div>
+    <div class="col-md-3"><div class="card border-success"><div class="card-body"><small class="text-muted">Pagadas</small><h4 class="text-success">{{ resumen.pagadas }}</h4></div></div></div>
+    <div class="col-md-3"><div class="card border-warning"><div class="card-body"><small class="text-muted">Pendientes</small><h4 class="text-warning">{{ resumen.pendientes }}</h4></div></div></div>
+    <div class="col-md-3"><div class="card border-danger"><div class="card-body"><small class="text-muted">Vencidas</small><h4 class="text-danger">{{ resumen.vencidas }}</h4></div></div></div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Unidad</th>
+                    <th>Inquilino</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Vencimiento</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for f in resumen.facturas %}
+            <tr>
+                <td>{{ f.unidad.identificador }}</td>
+                <td>{{ f.unidad.inquilino.nombre|default:"—" }}</td>
+                <td>${{ f.monto }}</td>
+                <td>
+                    {% if f.estado == 'pagada' %}
+                    <span class="badge text-bg-success">Pagada</span>
+                    {% elif f.estado == 'vencida' %}
+                    <span class="badge text-bg-danger">Vencida</span>
+                    {% else %}
+                    <span class="badge text-bg-warning">Pendiente</span>
+                    {% endif %}
+                </td>
+                <td>{{ f.fecha_vencimiento|default:"—" }}</td>
+                <td>
+                    {% if f.estado != 'pagada' %}
+                    <a href="{% url 'comprobante_crear' %}" class="btn btn-sm btn-outline-primary">Subir comprobante</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-muted text-center py-4">No hay facturas para este período.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
